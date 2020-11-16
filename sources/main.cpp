@@ -1,3 +1,5 @@
+// Copyright 2020 Burylov Denis <burylov01@mail.ru>
+
 #include <header.hpp>
 
 int main(int argc, char* argv[]) {
