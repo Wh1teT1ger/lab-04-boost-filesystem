@@ -1,6 +1,7 @@
 // Copyright 2020 Burylov Denis <burylov01@mail.ru>
 
 #include <gtest/gtest.h>
+
 #include <header.hpp>
 
 std::string current_dir() {
@@ -15,7 +16,6 @@ TEST(Brokers, Summary) {
       {"test broker",
        {Account{00000001, 20201103, 2}, Account{00000002, 20201201, 3}}}};
   EXPECT_EQ(broker1, broker2);
-  std::cout << current_dir() << std::endl;
 }
 
 TEST(Brokers, List) {
