@@ -9,6 +9,7 @@ int main(int argc, char* argv[]) {
   } else {
     path_to_ftp = fs::current_path();
   }
+  std::cout<<fs::current_path();
   std::map<std::string, std::set<Account>> brokers =
       brokers_summary(path_to_ftp);
   brokers_info(path_to_ftp, std::cout);
