@@ -49,7 +49,7 @@ target_include_directories(tests
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
         )
 
-target_link_libraries(tests GTest::gmock_main template)
+target_link_libraries(tests GTest::gmock_main lab-04-boost-filesystem)
 target_link_libraries(main lab-04-boost-filesystem)
 target_link_libraries(lab-04-boost-filesystem PUBLIC Boost::filesystem)
 

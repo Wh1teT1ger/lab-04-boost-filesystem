@@ -20,6 +20,9 @@ class Account {
  public:
   Account(const unsigned int& account, const unsigned int& date);
 
+  Account(const unsigned int& account, const unsigned int& date,
+          const size_t& files);
+
   [[nodiscard]] unsigned int last_date() const;
 
   [[nodiscard]] size_t number() const;
@@ -36,8 +39,11 @@ class Account {
 
 bool is_date(const std::string& date);
 
-std::set<Account> brokers_accounts(const fs::path& p);
+std::pair<std::set<Account>, std::set<std::string>> brokers_accounts(
+    const fs::path& p);
 
-std::map<std::string, std::set<Account>> path_to_list(const fs::path& p);
+std::map<std::string, std::set<Account>> brokers_summary(const fs::path& p);
+
+void brokers_info(const fs::path& p, std::ostream& out);
 
 #endif  // INCLUDE_HEADER_HPP_

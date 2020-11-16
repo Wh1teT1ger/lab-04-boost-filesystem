@@ -5,6 +5,10 @@
 Account::Account(const unsigned int& account, const unsigned int& date)
     : _account(account), _numbers(1), _last_date(date) {}
 
+Account::Account(const unsigned int& account, const unsigned int& date,
+                 const size_t& files)
+    : _account(account), _numbers(files), _last_date(date) {}
+
 unsigned int Account::last_date() const { return _last_date; }
 
 size_t Account::number() const { return _numbers; }
@@ -18,7 +22,8 @@ void Account::update_account(const unsigned int& date, const size_t& number) {
 }
 
 bool Account::operator==(const Account& other) const {
-  return _account == other._account;
+  return _account == other._account && _numbers == other._numbers &&
+         _last_date == other.last_date();
 }
 
 bool Account::operator!=(const Account& other) const {
@@ -35,9 +40,11 @@ bool is_date(const std::string& date) {
   return (mount <= 12 && day <= 31);
 }
 
-std::set<Account> brokers_accounts(const fs::path& p) {
+std::pair<std::set<Account>, std::set<std::string>> brokers_accounts(
+    const fs::path& p) {
   const std::regex filename_template("^balance_(\\d{8})_(\\d{8}).txt$");
   std::set<Account> accounts;
+  std::set<std::string> list_of_accounts;
   for (const auto& file_entry : fs::directory_iterator(p)) {
     fs::path entry_path;
     if (fs::is_regular_file(file_entry))
@@ -48,9 +55,7 @@ std::set<Account> brokers_accounts(const fs::path& p) {
     if (!std::regex_match(filename, filename_template)) continue;
     std::smatch match;
     std::regex_search(filename, match, filename_template);
-
     if (!is_date(match[2])) continue;
-
     Account account(std::stoi(match[1]), std::stoi(match[2]));
     auto iter_account = accounts.find(account);
     if (iter_account == accounts.end()) {
@@ -61,22 +66,31 @@ std::set<Account> brokers_accounts(const fs::path& p) {
       accounts.erase(iter_account);
       accounts.insert(account);
     }
-    std::cout << p.filename().string() << " " << entry_path.filename().string()
-              << std::endl;
+    list_of_accounts.insert(p.filename().string() + " " +
+                            entry_path.filename().string() + "\n");
   }
-  return accounts;
+  return std::make_pair(accounts, list_of_accounts);
 }
 
-std::map<std::string, std::set<Account>> path_to_list(const fs::path& p) {
+std::map<std::string, std::set<Account>> brokers_summary(const fs::path& p) {
   std::map<std::string, std::set<Account>> brokers_info;
-  std::set<std::string> brokers{"ib", "otkritie", "bcs"};
   for (const auto& directory_entry : fs::directory_iterator(p)) {
     if (!fs::is_directory(directory_entry)) continue;
     const auto& entry_path = directory_entry.path();
     auto entry_name = entry_path.filename().string();
-    if (brokers.find(entry_name) == brokers.end()) continue;
     brokers_info.insert(
-        std::make_pair(entry_name, brokers_accounts(entry_path)));
+        std::make_pair(entry_name, brokers_accounts(entry_path).first));
   }
   return brokers_info;
+}
+
+void brokers_info(const fs::path& p, std::ostream& out) {
+  for (const auto& directory_entry : fs::directory_iterator(p)) {
+    if (!fs::is_directory(directory_entry)) continue;
+    std::set<std::string> list_of_accounts =
+        brokers_accounts(directory_entry).second;
+    for (auto& account : list_of_accounts) {
+      out << account;
+    }
+  }
 }
